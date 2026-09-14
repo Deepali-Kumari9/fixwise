@@ -6,19 +6,34 @@ Laptop,motherboard_power,3000,12000,45,2,Motherboard or power circuit fault
 Laptop,keyboard,1200,3000,80,4,Keyboard unit fault or spill damage
 Laptop,storage_ram,1500,4000,88,4,Aging storage drive or insufficient RAM
 Laptop,liquid_damage,2000,15000,30,1,Possible internal corrosion from a liquid spill
+Laptop,charging,1000,3500,75,4,Charging port or charging circuit issue
+Laptop,power,1500,8000,50,3,Power supply or internal power fault
 Laptop,other,1000,6000,60,3,Unclear or uncommon issue that needs inspection
 Phone,battery,1200,3500,85,3,Battery degradation or failure
 Phone,overheating,500,2000,80,4,Excessive heat caused by battery or internal components
 Phone,screen,1500,12000,60,4,Display panel or touchscreen damage
 Phone,motherboard_power,2000,10000,40,3,Motherboard or power circuit fault
+Phone,charging,800,4000,75,4,Charging port or charging circuit issue
+Phone,power,1000,8000,45,3,Power supply or internal power fault
+Phone,liquid_damage,1500,10000,35,2,Possible internal corrosion from liquid exposure
 Phone,other,500,5000,60,3,Unclear or uncommon issue that needs inspection
 Tablet,battery,1500,4000,85,3,Battery degradation or failure
+Tablet,overheating,600,2500,80,4,Excessive heat caused by battery or internal components
 Tablet,screen,2000,10000,60,4,Display panel or touchscreen damage
+Tablet,motherboard_power,2000,9000,40,3,Motherboard or power circuit fault
 Tablet,charging,800,3000,75,4,Charging port or charging circuit issue
+Tablet,power,1000,7000,45,3,Power supply or internal power fault
+Tablet,liquid_damage,1500,10000,35,2,Possible internal corrosion from liquid exposure
 Tablet,other,700,5000,60,3,Unclear or uncommon issue that needs inspection
 TV,screen,3000,25000,50,7,Display panel or related display fault
+TV,overheating,1500,6000,55,6,Excessive heat caused by internal components
+TV,motherboard_power,2000,12000,40,5,Motherboard or power circuit fault
 TV,power,1500,8000,55,6,Power supply or internal power fault
+TV,liquid_damage,2000,10000,30,3,Possible internal corrosion from liquid exposure
 TV,other,1000,10000,55,6,Unclear or uncommon issue that needs inspection
 Monitor,screen,2500,12000,55,6,Display panel or display connection fault
+Monitor,overheating,1000,5000,60,6,Excessive heat caused by internal components
+Monitor,motherboard_power,1500,7000,45,5,Motherboard or internal power circuit fault
 Monitor,power,1000,5000,60,6,Power supply or internal power fault
+Monitor,liquid_damage,1500,8000,30,3,Possible internal corrosion from liquid exposure
 Monitor,other,800,5000,60,6,Unclear or uncommon issue that needs inspection
