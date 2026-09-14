@@ -1,11 +1,11 @@
 """
 The only job of this layer is to read the user's free-text description and
 map it to one of the fixed categories the decision engine understands.
-It never returns a price — the repair-cost database and decision_engine.py
+It never returns a price - the repair-cost database and decision_engine.py
 are the only source of pricing.
 
-Tries Gemini first, then Anthropic if configured, then falls back to
-simple keyword matching so the app always works.
+Tries Gemini first, then falls back to simple keyword matching
+so the app always works.
 """
 
 import json
@@ -27,6 +27,7 @@ GEMINI_URL = (
 )
 
 ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
+
 
 ALLOWED_CATEGORIES = {
     "battery",
@@ -199,6 +200,27 @@ def _call_gemini(
 def _fallback_categorize(problem_text, device_type):
     text = problem_text.lower()
 
+    # Liquid damage comes first because it can also mention
+    # charging, battery, power, or other symptoms.
+    if any(word in text for word in [
+        "liquid",
+        "water",
+        "spill",
+        "wet",
+        "coffee",
+        "juice",
+    ]):
+        return {
+            "category": "liquid_damage",
+            "confidence": "Medium",
+            "safety_flag": True,
+            "explanation": (
+                "The description suggests possible liquid damage, "
+                "which requires physical inspection."
+            ),
+        }
+
+    # Charging-related problems.
     if any(word in text for word in [
         "charging",
         "charge",
@@ -222,6 +244,7 @@ def _fallback_categorize(problem_text, device_type):
             ),
         }
 
+    # Battery-related problems.
     if any(word in text for word in [
         "battery",
         "drain",
@@ -241,11 +264,14 @@ def _fallback_categorize(problem_text, device_type):
             ),
         }
 
+    # Overheating problems.
     if any(word in text for word in [
         "overheat",
         "overheating",
+        "overheats",
         "hot",
         "heat",
+        "too warm",
     ]):
         return {
             "category": "overheating",
@@ -257,11 +283,17 @@ def _fallback_categorize(problem_text, device_type):
             ),
         }
 
+    # Screen/display problems.
     if any(word in text for word in [
         "screen",
         "display",
         "crack",
+        "cracked",
         "touch",
+        "flicker",
+        "flickering",
+        "lines on screen",
+        "black screen",
     ]):
         return {
             "category": "screen",
@@ -273,28 +305,73 @@ def _fallback_categorize(problem_text, device_type):
             ),
         }
 
+    # Keyboard/input problems.
     if any(word in text for word in [
-        "liquid",
-        "water",
-        "spill",
-        "wet",
+        "keyboard",
+        "key",
+        "keys",
+        "typing",
+        "trackpad",
+        "touchpad",
     ]):
         return {
-            "category": "liquid_damage",
+            "category": "keyboard",
             "confidence": "Medium",
-            "safety_flag": True,
+            "safety_flag": False,
             "explanation": (
-                "The description suggests possible liquid damage, "
-                "which requires physical inspection."
+                f"The description suggests a keyboard or input "
+                f"problem with the {device_type.lower()}."
             ),
         }
 
+    # Storage/RAM problems.
+    if any(word in text for word in [
+        "ssd",
+        "hard drive",
+        "hard disk",
+        "storage",
+        "disk",
+        "ram",
+        "memory",
+        "slow boot",
+        "slow startup",
+    ]):
+        return {
+            "category": "storage_ram",
+            "confidence": "Medium",
+            "safety_flag": False,
+            "explanation": (
+                f"The description suggests a storage or memory "
+                f"issue with the {device_type.lower()}."
+            ),
+        }
+
+    # Motherboard/power-circuit problems.
+    if any(word in text for word in [
+        "motherboard",
+        "mainboard",
+        "power circuit",
+        "power ic",
+        "logic board",
+    ]):
+        return {
+            "category": "motherboard_power",
+            "confidence": "Low",
+            "safety_flag": True,
+            "explanation": (
+                "The description may indicate a motherboard or "
+                "power-circuit issue that requires physical inspection."
+            ),
+        }
+
+    # General power problems.
     if any(word in text for word in [
         "power",
         "won't turn on",
         "doesn't turn on",
         "not switching on",
         "dead",
+        "no power",
     ]):
         return {
             "category": "power",
@@ -306,6 +383,7 @@ def _fallback_categorize(problem_text, device_type):
             ),
         }
 
+    # Unknown problem.
     return {
         "category": "other",
         "confidence": "Low",
