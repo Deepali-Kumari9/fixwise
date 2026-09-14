@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixWise — {% block title %}{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="logo">Fix<span>Wise</span></div>
+    <div class="sublogo">Know what's worth fixing.</div>
+
+    <nav>
+      <a href="{{ url_for('index') }}" class="{{ 'active' if active == 'diagnose' else '' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3v4H5v14h14V7h-4V3H9z"/><path d="M9 12h6M9 16h6"/></svg>
+        Diagnose
+      </a>
+      <a href="{{ url_for('history') }}" class="{{ 'active' if active == 'passport' else '' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        Repair passport
+      </a>
+    </nav>
+
+    <div class="foot-note">Every repair decision, checked before you pay for it.</div>
+  </aside>
+
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Diagnose{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <h1>Diagnose a device problem</h1>
+  <p>Describe what's going wrong and what you've been quoted — get an independent read before you pay anyone.</p>
+</div>
+
+{% if error %}
+<div class="error-box">{{ error }}</div>
+{% endif %}
+
+<div class="form-grid">
+
+  <div class="card card-pad">
+    <form action="{{ url_for('analyze') }}" method="POST" enctype="multipart/form-data">
+
+      <label for="device_type">Device</label>
+      <select id="device_type" name="device_type" required>
+        <option value="Laptop">Laptop</option>
+        <option value="Phone">Phone</option>
+        <option value="Tablet">Tablet</option>
+        <option value="TV">TV</option>
+        <option value="Monitor">Monitor</option>
+      </select>
+
+      <label for="brand">Brand</label>
+      <input
+        type="text"
+        id="brand"
+        name="brand"
+        placeholder="e.g. Samsung, Apple, Lenovo"
+        required
+      >
+
+      <label for="model">Model</label>
+      <input
+        type="text"
+        id="model"
+        name="model"
+        placeholder="e.g. Galaxy S23, ThinkPad E14"
+        required
+      >
+
+      <label for="age">Age of device (years)</label>
+      <input
+        type="number"
+        id="age"
+        name="age"
+        min="0"
+        max="15"
+        value="3"
+        required
+      >
+
+      <label for="problem">Describe the problem, in your own words</label>
+      <textarea
+        id="problem"
+        name="problem"
+        rows="4"
+        placeholder="e.g. the battery drains within an hour even when fully charged"
+        required
+      ></textarea>
+
+      <label for="problem_image">Add a photo (optional)</label>
+      <input
+        type="file"
+        id="problem_image"
+        name="problem_image"
+        accept="image/png,image/jpeg,image/webp"
+      >
+      <small class="field-help">
+        A photo can help identify visible damage such as cracks, broken ports, or liquid damage.
+      </small>
+
+      <label for="quote">Technician's quoted price (optional, ₹)</label>
+      <input
+        type="number"
+        id="quote"
+        name="quote"
+        min="0"
+        placeholder="e.g. 6500"
+      >
+
+      <label for="replacement_value">
+        Estimated price of a new/replacement device (optional, ₹)
+      </label>
+      <input
+        type="number"
+        id="replacement_value"
+        name="replacement_value"
+        min="0"
+        placeholder="Defaults to ₹35,000"
+      >
+
+      <button type="submit" class="primary">Run diagnosis</button>
+    </form>
+  </div>
+
+  <div class="card info-card card-pad">
+    <h2>How this works</h2>
+    <p>
+      An AI model reads your device details and problem description and
+      matches it to a known problem category — it never invents a price.
+      Every cost range and repair-vs-replace call comes from a separate,
+      transparent dataset and rule set, so the numbers stay explainable.
+    </p>
+  </div>
+
+</div>
+
+{% endblock %}

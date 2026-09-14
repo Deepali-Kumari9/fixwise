@@ -1,0 +1,24 @@
+device_type,category,low_cost,high_cost,repairability_score,typical_life_years,description
+Laptop,battery,2500,4500,85,3,Battery degradation or failure
+Laptop,overheating,800,1800,90,5,Dust-clogged heatsink or dried thermal paste
+Laptop,screen,3500,9000,55,4,Display panel fault or loose display cable
+Laptop,motherboard_power,3000,12000,45,2,Motherboard or power circuit fault
+Laptop,keyboard,1200,3000,80,4,Keyboard unit fault or spill damage
+Laptop,storage_ram,1500,4000,88,4,Aging storage drive or insufficient RAM
+Laptop,liquid_damage,2000,15000,30,1,Possible internal corrosion from a liquid spill
+Laptop,other,1000,6000,60,3,Unclear or uncommon issue that needs inspection
+Phone,battery,1200,3500,85,3,Battery degradation or failure
+Phone,overheating,500,2000,80,4,Excessive heat caused by battery or internal components
+Phone,screen,1500,12000,60,4,Display panel or touchscreen damage
+Phone,motherboard_power,2000,10000,40,3,Motherboard or power circuit fault
+Phone,other,500,5000,60,3,Unclear or uncommon issue that needs inspection
+Tablet,battery,1500,4000,85,3,Battery degradation or failure
+Tablet,screen,2000,10000,60,4,Display panel or touchscreen damage
+Tablet,charging,800,3000,75,4,Charging port or charging circuit issue
+Tablet,other,700,5000,60,3,Unclear or uncommon issue that needs inspection
+TV,screen,3000,25000,50,7,Display panel or related display fault
+TV,power,1500,8000,55,6,Power supply or internal power fault
+TV,other,1000,10000,55,6,Unclear or uncommon issue that needs inspection
+Monitor,screen,2500,12000,55,6,Display panel or display connection fault
+Monitor,power,1000,5000,60,6,Power supply or internal power fault
+Monitor,other,800,5000,60,6,Unclear or uncommon issue that needs inspection

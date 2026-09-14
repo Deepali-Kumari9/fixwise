@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Report{% endblock %}
+{% block content %}
+
+<a class="back-link" href="{{ url_for('index') }}">&larr; Run another diagnosis</a>
+
+{% set ring_color = '#0E7C66' if r.repairability >= 70 else ('#E8A23D' if r.repairability >= 40 else '#E14B4B') %}
+
+<div class="hero-card">
+  <div>
+    <div class="eyebrow">Likely issue</div>
+    <div class="cause">{{ r.category }}</div>
+    <span class="badge conf-{{ r.confidence|lower }}">{{ r.confidence }} confidence</span>
+    <p class="explain">{{ r.explanation }}</p>
+  </div>
+  <div class="ring-box">
+    <div class="ring" style="background: conic-gradient({{ ring_color }} {{ r.repairability }}%, #E7EDEC 0)">
+      <div class="ring-inner">
+        <div class="ring-score">{{ r.repairability }}%</div>
+      </div>
+    </div>
+    <div class="ring-caption">repairability score</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card subcard">
+    <h3>Repair cost range</h3>
+    <div class="figure">₹{{ "{:,}".format(r.low) }} – ₹{{ "{:,}".format(r.high) }}</div>
+  </div>
+  <div class="card subcard">
+    <h3>What you entered</h3>
+    <div class="meta-strip">
+     {{ r.brand }} {{ r.model }} · {{ r.device_type }}, {{ r.age }} yrs old
+    {% if r.quote %} · quoted ₹{{ "{:,}".format(r.quote) }}{% endif %}
+</div>
+  </div>
+</div>
+
+<div class="banner rec-{{ r.recommendation }}">
+  <span class="tag">{{ r.recommendation|capitalize }}</span>
+  <p>{{ r.rec_message }}</p>
+</div>
+
+<div class="quote-card status-{{ r.quote_status }}">
+  <b>Your quote, checked —</b> {{ r.quote_message }}
+</div>
+
+{% if r.safety_flag %}
+<div class="safety-card">
+  <b>Before you proceed:</b> FixWise isn't confident enough about this one from the available information alone.
+  Treat this as a starting point, not a final answer — get it physically inspected before paying for anything.
+</div>
+{% endif %}
+
+<div class="card questions-card">
+  <h3>Ask the technician</h3>
+  <ul class="q-list">
+    {% for q in r.questions %}
+    <li><span class="num">{{ loop.index }}</span>{{ q }}</li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% endblock %}

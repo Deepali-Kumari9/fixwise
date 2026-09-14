@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Repair passport{% endblock %}
+{% block content %}
+
+<div class="page-head">
+  <h1>Repair passport</h1>
+  <p>Every diagnosis you've run, logged against the device it belongs to.</p>
+</div>
+
+<div class="card">
+  {% if rows|length == 0 %}
+
+  <div class="empty-state">
+    No diagnoses logged yet — run one from the Diagnose tab and it'll show up here.
+  </div>
+
+  {% else %}
+
+  <table class="history-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Device</th>
+        <th>Problem</th>
+        <th>Category</th>
+        <th>Confidence</th>
+        <th>Quote</th>
+        <th>Recommendation</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for row in rows %}
+
+      <tr>
+        <td>{{ row["created_at"][:10] }}</td>
+
+        <td>
+          {% if row["brand"] and row["model"] %}
+          <strong>{{ row["brand"] }} {{ row["model"] }}</strong>
+          <br>
+        {% endif %}
+
+        <small>{{ row["device_type"] }} · {{ row["age"] }} yrs</small>
+        </td>
+
+        <td>{{ row["problem_text"] }}</td>
+
+        <td>
+          {{ row["category"]|replace("_", " ")|title }}
+        </td>
+
+        <td>
+          <span class="chip conf-{{ row["confidence"]|lower }}">
+            {{ row["confidence"] }}
+          </span>
+        </td>
+
+        <td>
+          {% if row["quote"] %}
+            ₹{{ "{:,}".format(row["quote"]) }}
+          {% else %}
+            —
+          {% endif %}
+        </td>
+
+        <td>
+          <strong>{{ row["recommendation"]|capitalize }}</strong>
+        </td>
+      </tr>
+
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% endif %}
+</div>
+
+{% endblock %}
