@@ -1,115 +1,242 @@
 # FixWise
 
-Know what's worth fixing — before you pay for it.
+### Know what your repair is really worth.
 
-A consumer decision-support web app: you describe a laptop problem and what a technician
-quoted you, and FixWise tells you the likely issue, a fair price range, and whether repairing
-or replacing makes more sense — before you've paid anyone.
+FixWise is an AI-powered consumer repair decision platform that helps people make better repair decisions before paying a technician.
 
-This matches the project plan's tech stack and architecture:
+Instead of simply finding a repair shop, FixWise gives the consumer an independent starting point:
 
-| Layer | Technology | Used for |
-|---|---|---|
-| Frontend | HTML + CSS (Jinja templates) | Form, results, history pages |
-| Backend | Python + Flask | Routes and application logic |
-| Database | SQLite | Repair-cost dataset and saved reports |
-| AI | Anthropic API (Claude), with a keyword fallback | Reads the free-text problem and picks a category |
-| Decision logic | Plain Python | Quote check and repair-vs-replace rules |
-| Testing | pytest | Covers the decision engine |
+- Likely problem category
+- Estimated repair cost range
+- Repairability score
+- Repair vs replace recommendation
+- Technician questions to ask
+- Technician quote analysis
+- Safety/inspection warnings for uncertain or risky cases
+
+## The Problem
+
+Repair decisions are often based on incomplete information.
+
+Consumers may not know:
+
+- What is actually wrong with their device
+- Whether a quoted price is reasonable
+- Whether repairing is better than replacing
+- What questions to ask a technician
+- Whether the issue requires physical inspection
+
+This creates an information gap between consumers and repair providers.
+
+## The Solution
+
+FixWise acts as a consumer-side decision layer before repair.
+
+The user provides:
+
+1. Device type
+2. Brand and model
+3. Device age
+4. Problem description
+5. Optional photo
+6. Optional technician quote
+7. Optional replacement-device price
+
+FixWise then produces an explainable repair report.
+
+## How It Works
+
+```text
+User Input
+    ↓
+AI Problem Classification
+    ↓
+Structured Repair-Cost Dataset
+    ↓
+Transparent Decision Engine
+    ↓
+Repair / Replace / Inspect Recommendation
+    ↓
+FixWise Report
+```
+
+The AI does not decide the repair price.
+
+The AI classifies the problem into a known category. Repair-cost estimates come from a separate structured dataset, while repair-vs-replace decisions use transparent rules.
+
+## Technology
+
+- Python
+- Flask
+- SQLite
+- Gemini API
+- Anthropic API (optional fallback)
+- REST API requests
+- HTML / CSS
+- Jinja Templates
+- Pytest
+
+## AI Layer
+
+FixWise currently tries Gemini first for problem classification.
+
+If Gemini is unavailable or fails, the system can use Anthropic when configured. If no AI API is available, FixWise falls back to keyword-based classification so the application can still run.
+
+The AI layer returns:
+
+- Problem category
+- Confidence level
+- Safety flag
+- Short explanation
+
+Supported categories include:
+
+- Battery
+- Overheating
+- Screen
+- Motherboard / Power
+- Keyboard
+- Storage / RAM
+- Liquid Damage
+- Charging
+- Power
+- Other
+
+## Explainability
+
+FixWise intentionally separates AI interpretation from financial decision-making.
+
+- **AI** → Interprets the user's description
+- **Repair-cost dataset** → Provides the estimated cost range
+- **Decision engine** → Evaluates quote and repair-vs-replace logic
+
+This makes the system easier to understand, test and improve.
+
+## Safety
+
+FixWise does not claim to provide a definitive physical diagnosis.
+
+Low-confidence, liquid-damage, motherboard/power and potentially hazardous cases can be directed toward physical inspection.
+
+The application is intended as a decision-support tool, not a replacement for a qualified technician.
+
+## Project Structure
+
+```text
+fixwise/
+├── ai_layer.py
+├── app.py
+├── decision_engine.py
+├── init_db.py
+├── requirements.txt
+├── data/
+│   └── repair_costs.csv
+├── static/
+│   └── style.css
+├── templates/
+│   ├── base.html
+│   ├── history.html
+│   ├── index.html
+│   └── result.html
+└── tests/
+    └── test_decision_engine.py
+```
 
 ## Setup
 
+### 1. Create and activate a virtual environment
+
 ```bash
-cd fixwise
 python -m venv venv
-source venv/bin/activate        # on Windows PowerShell: venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python init_db.py               # creates data/fixwise.db and loads the cost dataset
-python app.py                   # runs at http://127.0.0.1:5000
 ```
 
-## Setting up real AI (recommended)
-
-Without an API key, the app still runs end-to-end using a simple keyword matcher in
-`ai_layer.py` — good for grading the architecture, but it won't understand descriptions
-that don't contain an obvious keyword. To get real language understanding:
-
-1. Get an API key from https://console.anthropic.com
-2. Copy `.env.example` to a new file named `.env` in the `fixwise` folder
-3. Open `.env` and replace `your-key-here` with your real key:
-   ```
-   ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxx
-   ```
-4. Restart `python app.py` — it loads the key automatically on startup
-
-`.env` is already listed in `.gitignore` so the key never accidentally gets committed
-or shared. If you'd rather set it as an environment variable instead of a `.env` file:
+Windows PowerShell:
 
 ```powershell
-# Windows PowerShell (only lasts for the current terminal session)
-$env:ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxxxxx"
+.\venv\Scripts\Activate.ps1
 ```
+
+### 2. Install dependencies
 
 ```bash
-# Mac/Linux
-export ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxx
+pip install -r requirements.txt
 ```
 
-## Run the tests
+### 3. Configure API keys
+
+Create a `.env` file in the project root.
+
+```env
+GEMINI_API_KEY=your-gemini-key
+ANTHROPIC_API_KEY=your-anthropic-key
+```
+
+API keys are intentionally excluded from Git using `.gitignore`.
+
+An example configuration is available in `.env.example`.
+
+### 4. Initialize the database
 
 ```bash
-pytest
+python init_db.py
 ```
 
-## How a request flows through the app
+### 5. Run the application
 
-```
-User → Flask route (/analyze) → AI layer picks a category
-     → decision_engine looks up the cost range for that category (SQLite)
-     → decision_engine checks the quote and decides repair / replace / inspect
-     → result.html renders the full report
-     → the report is saved to the reports table for the Repair Passport page
+```bash
+python app.py
 ```
 
-## The one rule the whole design follows
+Then open:
 
-**The AI is only allowed to classify the problem. It never sets or influences a price.**
-All pricing and the repair-vs-replace call come from `decision_engine.py` and the
-`repair_costs` table — plain, readable rules anyone can check. This matters because it's
-what makes the tool trustworthy: if the AI could quietly shift a number, there'd be no way
-to tell whether it was reasoning or just producing something plausible-sounding.
+http://127.0.0.1:5000
 
-## Known limitations (stated honestly, not hidden)
 
-- The repair-cost dataset (`data/repair_costs.csv`) is a small starting set of eight
-  categories, not real collected repair data. A production version needs an actual dataset
-  built from real repair outcomes.
-- The AI layer, without an API key, falls back to basic keyword matching — good enough to
-  demo the architecture, not good enough to trust for real classification.
-- `replacement_value` currently defaults to a flat ₹35,000 if the user doesn't provide one;
-  a real version would look this up by laptop brand/model instead of guessing.
+## Testing
 
-## Ethics and safety rules built into the logic
+Run:
 
-- Every diagnosis carries an explicit confidence level — never a false claim of certainty.
-- `liquid_damage` and `motherboard_power` categories, and any `Low`-confidence result, are
-  always routed to "get a professional inspection" rather than a final repair/replace answer.
-- If technicians ever pay for leads through a future version of this platform, that payment
-  must never be allowed to influence the diagnosis or the quote check — the two need to stay
-  structurally separate, or the product loses the only reason anyone would trust it.
-- Prices are always shown as ranges, never as guarantees.
+```bash
+pytest -q
+```
 
-## Suggested team split (from the project plan)
+The decision engine currently has automated tests covering:
 
-| Role | Work |
-|---|---|
-| Backend | Flask routes, database, decision engine |
-| Frontend | Templates, styling, responsive layout |
-| AI/Data | Prompt design, category list, repair-cost dataset and validation |
-| Testing/Research | Test cases, real price research, documentation |
+- Repair-cost lookup
+- Unknown-category fallback
+- Missing quotes
+- High and low quotes
+- Fair quotes
+- Safety-based inspection
+- Repair decisions
+- Replacement decisions
 
-## Future expansion
+## Current Scope
 
-Phones, washing machines, ACs and other repairable products, using the same architecture —
-only the `repair_costs` dataset and category list need to grow, since the AI layer and
-decision engine are already written to be category-driven rather than laptop-specific.
+The MVP currently supports:
+
+- Laptops
+- Phones
+- Tablets
+- TVs
+- Monitors
+
+The repair-cost dataset is an initial structured dataset for the prototype and should be expanded and validated with real repair-market data before production use.
+
+## Future Development
+
+- Model-specific repair pricing
+- Larger repair-case dataset
+- Improved image understanding
+- More device categories
+- Verified technician ecosystem
+- Warranty and spare-part information
+- Predictive maintenance
+- Refurbishment and resale support
+- Repair Passport expansion
+
+## Vision
+
+People should not have to blindly trust a repair quote because they lack the information to question it.
+
+FixWise aims to give consumers that missing decision layer.
